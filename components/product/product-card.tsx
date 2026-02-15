@@ -44,9 +44,9 @@ type ProductCardFrameProps = {
 
 function ProductCardFrame({ children, className, href }: ProductCardFrameProps) {
   const baseClasses = cn(
-    'group cursor-pointer rounded-lg border border-border bg-card',
+    'group cursor-pointer rounded-lg border border-border bg-card p-4',
     'shadow-soft hover:shadow-soft-hover',
-    'transition-all duration-200',
+    'transition-smooth',
     'hover:-translate-y-0.5 hover:border-primary',
     'focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2',
     className
@@ -74,7 +74,7 @@ function ProductCardImage({ className, priority = false }: ProductCardImageProps
   if (!product) throw new Error('ProductCardImage must be used within ProductCard.Provider')
 
   return (
-    <div className={cn('relative aspect-square overflow-hidden rounded-lg', className)}>
+    <div className={cn('relative aspect-square overflow-hidden rounded-lg mb-4', className)}>
       <Image
         src={product.image}
         alt={product.name}
@@ -105,7 +105,7 @@ type ProductCardContentProps = {
 
 function ProductCardContent({ children, className }: ProductCardContentProps) {
   return (
-    <div className={cn('p-4 space-y-3', className)}>
+    <div className={cn('space-y-3', className)}>
       {children}
     </div>
   )
@@ -121,7 +121,7 @@ function ProductCardTitle({ className }: ProductCardTitleProps) {
   if (!product) throw new Error('ProductCardTitle must be used within ProductCard.Provider')
 
   return (
-    <h3 className={cn('text-h3-mobile md:text-h3 line-clamp-2', className)}>
+    <h3 className={cn('text-h3-mobile md:text-h3 line-clamp-2 text-foreground', className)}>
       {product.name}
     </h3>
   )
@@ -171,7 +171,7 @@ function ProductCardPrice({ className }: ProductCardPriceProps) {
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <span className="text-price-mobile md:text-price">
+      <span className="text-price-mobile md:text-price text-foreground">
         {product.price.toLocaleString('vi-VN')}đ
       </span>
       {product.originalPrice && product.originalPrice > product.price && (
@@ -187,9 +187,10 @@ function ProductCardPrice({ className }: ProductCardPriceProps) {
 type ProductCardAddToCartProps = {
   className?: string
   onAddToCart?: (productId: string) => void
+  compact?: boolean
 }
 
-function ProductCardAddToCart({ className, onAddToCart }: ProductCardAddToCartProps) {
+function ProductCardAddToCart({ className, onAddToCart, compact = false }: ProductCardAddToCartProps) {
   const product = use(ProductCardContext)
   if (!product) throw new Error('ProductCardAddToCart must be used within ProductCard.Provider')
 
@@ -199,16 +200,39 @@ function ProductCardAddToCart({ className, onAddToCart }: ProductCardAddToCartPr
     onAddToCart?.(product.id)
   }
 
+  if (compact) {
+    return (
+      <button
+        onClick={handleClick}
+        disabled={!product.inStock}
+        className={cn(
+          'flex items-center justify-center w-10 h-10',
+          'bg-accent text-accent-foreground',
+          'rounded-full shadow-sm',
+          'transition-all',
+          'hover:bg-accent/90 active:scale-95',
+          'focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2',
+          'disabled:opacity-60 disabled:cursor-not-allowed',
+          'cursor-pointer',
+          className
+        )}
+        aria-label={`Thêm ${product.name} vào giỏ hàng`}
+      >
+        <ShoppingCart className="h-4 w-4" />
+      </button>
+    )
+  }
+
   return (
     <button
       onClick={handleClick}
       disabled={!product.inStock}
       className={cn(
-        'touch-target px-4 py-2',
+        'h-10 px-6',
         'bg-accent text-accent-foreground',
-        'rounded-md shadow-md',
-        'transition-colors duration-200',
-        'hover:bg-accent/90',
+        'rounded-full shadow-sm',
+        'transition-all',
+        'hover:bg-accent/90 active:scale-95',
         'focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2',
         'disabled:opacity-60 disabled:cursor-not-allowed',
         'flex items-center justify-center gap-2',
@@ -218,7 +242,7 @@ function ProductCardAddToCart({ className, onAddToCart }: ProductCardAddToCartPr
       aria-label={`Thêm ${product.name} vào giỏ hàng`}
     >
       <ShoppingCart className="h-4 w-4" />
-      <span className="text-sm font-medium">Thêm vào giỏ</span>
+      <span className="text-sm font-medium">Thêm</span>
     </button>
   )
 }

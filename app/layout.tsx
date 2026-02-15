@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Toaster } from "sonner";
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["vietnamese", "latin"],
@@ -47,6 +48,17 @@ export default function RootLayout({
               <div className="flex-1">{children}</div>
               <Footer />
             </div>
+            <Toaster 
+              position="bottom-center" 
+              toastOptions={{
+                style: {
+                  background: 'var(--card)',
+                  color: 'var(--card-foreground)',
+                  border: '1px solid var(--border)',
+                },
+                className: 'font-body',
+              }}
+            />
           </TooltipProvider>
         </ThemeProvider>
       </body>

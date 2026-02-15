@@ -1,172 +1,57 @@
 ---
 inclusion: always
 ---
----
-inclusion: always
----
 
 # Zent UI - Technical Guidelines
 
 ## Tech Stack
 
-- **Framework**: Next.js 16.1.6 (App Router)
-- **React**: 19.2.3 (with React 19 features)
-- **TypeScript**: 5.x (strict mode enabled)
-- **Styling**: Tailwind CSS 4.x with CSS variables
-- **UI Components**: shadcn/ui (New York style) + Radix UI primitives
-- **Icons**: Lucide React
-- **Forms**: React Hook Form + Zod validation
-- **Theme**: next-themes for dark mode support
+- Next.js 16.1.6 (App Router) + React 19.2.3
+- TypeScript 5.x (strict mode)
+- Tailwind CSS 4.x with CSS variables (OKLCH color space)
+- shadcn/ui (New York style) + Radix UI primitives
+- Lucide React icons
+- React Hook Form + Zod validation
+- next-themes for dark mode
+- Zustand for state management
+- Package manager: `pnpm`
 
-## Project Structure
+## Critical Path Aliases
 
-```
-app/              # Next.js App Router pages
-components/ui/    # shadcn/ui components
-lib/              # Utility functions
-hooks/            # Custom React hooks
-public/           # Static assets
-```
+Always use these TypeScript path aliases:
+- `@/components` - components directory
+- `@/lib` - lib directory  
+- `@/hooks` - hooks directory
+- `@/ui` - components/ui directory
 
-## Path Aliases
+## React 19 Rules
 
-Use TypeScript path aliases consistently:
-- `@/components` → components directory
-- `@/lib` → lib directory
-- `@/hooks` → hooks directory
-- `@/ui` → components/ui directory
-
-## Component Conventions
-
-### shadcn/ui Components
-
-- All UI components use class-variance-authority (CVA) for variant management
-- Use `cn()` utility from `@/lib/utils` for className merging
-- Components support `asChild` prop pattern via Radix Slot for composition
-- Include data attributes for variant tracking: `data-slot`, `data-variant`, `data-size`
-
-### Component Structure
+NEVER use `forwardRef` - React 19 forwards refs automatically. Use `ref` prop directly on function components.
 
 ```tsx
-// Use React 19 features - no forwardRef needed
-function Component({ className, ...props }: ComponentProps) {
-  return (
-    <element
-      className={cn(componentVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
+// ✅ Correct - React 19 pattern
+function Component({ className, ref, ...props }: ComponentProps) {
+  return <element ref={ref} className={cn(variants({ className }))} {...props} />
 }
+
+// ❌ Wrong - Don't use forwardRef
+const Component = forwardRef<HTMLElement, ComponentProps>((props, ref) => { ... })
 ```
 
-### React 19 Patterns
+## Component Architecture
 
-- **No forwardRef**: React 19 automatically forwards refs
-- Use `ref` prop directly on function components
-- Leverage improved JSX transform (`jsx: "react-jsx"`)
+All components MUST follow shadcn/ui patterns:
 
-## Styling Guidelines
-
-### Tailwind CSS 4.x
-
-- Use `@import "tailwindcss"` syntax (not @tailwind directives)
-- CSS variables defined in `@theme inline` block
-- Custom dark mode variant: `@custom-variant dark (&:is(.dark *))`
-- Use semantic color tokens: `bg-primary`, `text-foreground`, `border-border`
-
-### Color System
-
-- Use OKLCH color space for better perceptual uniformity
-- CSS variables for theme colors (supports light/dark modes)
-- Semantic naming: `primary`, `secondary`, `muted`, `accent`, `destructive`
-- Chart colors: `chart-1` through `chart-5`
-
-### Dark Mode
-
-- Class-based dark mode via next-themes
-- All components must support both light and dark variants
-- Test color contrast in both modes
-- Use `dark:` prefix for dark mode utilities
-
-## TypeScript Standards
-
-- **Strict mode enabled**: All type checks enforced
-- Use `type` for props, `interface` for extensible contracts
-- Prefer `React.ComponentProps<"element">` for native element props
-- Use `VariantProps<typeof variants>` for CVA variant types
-- No `any` types - use `unknown` and type guards instead
-
-## Code Style
-
-### Naming Conventions
-
-- Components: PascalCase (`Button`, `AlertDialog`)
-- Files: kebab-case for utilities, PascalCase for components
-- Functions: camelCase
-- Constants: UPPER_SNAKE_CASE for true constants
-- CSS variables: kebab-case with semantic prefixes
-
-### Import Order
-
-1. React and Next.js imports
-2. Third-party libraries
-3. Local components and utilities
-4. Types and interfaces
-5. Styles
-
-### Component Props
-
-- Destructure props with defaults
-- Use rest spread for forwarding props
-- Type props explicitly with TypeScript
-- Support `className` for style overrides
-
-## Performance Patterns
-
-- Use `next/image` for all images with proper sizing
-- Implement proper loading states with Suspense boundaries
-- Lazy load heavy components with dynamic imports
-- Optimize font loading with `next/font`
-
-## Accessibility
-
-- All interactive elements must be keyboard accessible
-- Use semantic HTML elements
-- Include proper ARIA attributes when needed
-- Focus states must be visible (ring utilities)
-- Support `prefers-reduced-motion`
-
-## Form Handling
-
-- Use React Hook Form for form state management
-- Validate with Zod schemas via `@hookform/resolvers`
-- Provide clear error messages
-- Use Field component for consistent form layouts
-
-## Testing & Quality
-
-- Run `pnpm lint` before committing
-- ESLint configured with Next.js recommended rules
-- TypeScript strict mode catches type errors
-- Test components in both light and dark modes
-
-## Common Utilities
-
-### `cn()` Function
-
-Combines clsx and tailwind-merge for optimal className handling:
+1. Use `class-variance-authority` (CVA) for variants
+2. Use `cn()` from `@/lib/utils` for className merging
+3. Support `asChild` prop via Radix Slot for composition
+4. Include data attributes: `data-slot`, `data-variant`, `data-size`
+5. Accept `className` prop for style overrides
 
 ```tsx
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
-<div className={cn("base-classes", conditional && "conditional-classes", className)} />
-```
-
-### CVA Variants
-
-Define component variants with class-variance-authority:
-
-```tsx
 const variants = cva("base-classes", {
   variants: {
     variant: { default: "...", destructive: "..." },
@@ -174,28 +59,182 @@ const variants = cva("base-classes", {
   },
   defaultVariants: { variant: "default", size: "default" }
 })
+
+type ComponentProps = React.ComponentProps<"button"> & VariantProps<typeof variants>
+
+function Component({ className, variant, size, ...props }: ComponentProps) {
+  return (
+    <button
+      className={cn(variants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
 ```
 
-## Dependencies Management
+## Styling Rules
 
-- Use `pnpm` as package manager
-- Keep dependencies up to date
-- Prefer peer dependencies for shared libraries
-- Check bundle size impact of new dependencies
+### Tailwind CSS 4.x Syntax
 
-## Build & Development
+- Use `@import "tailwindcss"` (NOT `@tailwind` directives)
+- Define CSS variables in `@theme inline` block
+- Custom dark mode: `@custom-variant dark (&:is(.dark *))`
+- Use semantic tokens: `bg-primary`, `text-foreground`, `border-border`
 
-- `pnpm dev` - Start development server
+### Color System
+
+- OKLCH color space for perceptual uniformity
+- Semantic names: `primary`, `secondary`, `muted`, `accent`, `destructive`
+- Chart colors: `chart-1` through `chart-5`
+- CSS variables support light/dark modes automatically
+
+### Dark Mode Requirements
+
+- Class-based dark mode via next-themes
+- ALL components MUST support both light and dark variants
+- Use `dark:` prefix for dark mode utilities
+- Test color contrast in both modes before delivery
+
+## TypeScript Standards
+
+- Strict mode enabled - no exceptions
+- Use `type` for props, `interface` for extensible contracts
+- Use `React.ComponentProps<"element">` for native element props
+- Use `VariantProps<typeof variants>` for CVA variant types
+- NEVER use `any` - use `unknown` with type guards
+
+## Naming Conventions
+
+- Components: `PascalCase` (Button.tsx, AlertDialog.tsx)
+- Component files: `PascalCase` (Button.tsx)
+- Utility files: `kebab-case` (use-mobile.ts, cart-store.ts)
+- Functions: `camelCase`
+- Constants: `UPPER_SNAKE_CASE`
+- CSS variables: `kebab-case` with semantic prefixes
+
+## Import Order
+
+1. React and Next.js imports
+2. Third-party libraries
+3. Local components and utilities
+4. Types and interfaces
+5. Styles (if any)
+
+## Performance Requirements
+
+- Use `next/image` for ALL images with explicit width/height
+- Implement Suspense boundaries for loading states
+- Lazy load heavy components with `dynamic` imports
+- Optimize fonts with `next/font`
+
+## Accessibility Requirements
+
+- All interactive elements MUST be keyboard accessible
+- Use semantic HTML elements
+- Include ARIA attributes when semantic HTML insufficient
+- Focus states MUST be visible (use ring utilities)
+- Support `prefers-reduced-motion` for animations
+
+## Form Patterns
+
+- Use React Hook Form for form state
+- Validate with Zod schemas via `@hookform/resolvers`
+- Use Field component from `@/ui/field` for consistent layouts
+- Provide clear, actionable error messages
+
+## State Management
+
+Use Zustand for global state (cart, user, wishlist, UI state):
+
+```tsx
+// lib/store/cart-store.ts
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+
+type CartStore = {
+  items: CartItem[]
+  addItem: (item: CartItem) => void
+  removeItem: (id: string) => void
+  getTotalItems: () => number
+}
+
+export const useCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      addItem: (item) => set((state) => ({ items: [...state.items, item] })),
+      removeItem: (id) => set((state) => ({ items: state.items.filter(i => i.id !== id) })),
+      getTotalItems: () => get().items.reduce((total, item) => total + item.quantity, 0),
+    }),
+    {
+      name: 'cart-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+)
+```
+
+**Usage in Client Components:**
+
+```tsx
+'use client'
+
+import { useCartStore } from '@/lib/store/cart-store'
+
+function Component() {
+  // ✅ Use selector pattern for performance
+  const totalItems = useCartStore((state) => state.getTotalItems())
+  const addItem = useCartStore((state) => state.addItem)
+  
+  // ❌ Don't subscribe to entire store
+  // const store = useCartStore()
+  
+  return <div>{totalItems}</div>
+}
+```
+
+**Store Organization:**
+- `lib/store/cart-store.ts` - Shopping cart
+- `lib/store/user-store.ts` - User authentication
+- `lib/store/wishlist-store.ts` - Wishlist
+- `lib/store/ui-store.ts` - UI state (modals, drawers)
+
+**Rules:**
+- ONLY use in Client Components (mark with `'use client'`)
+- Use selector pattern to prevent unnecessary re-renders
+- Use `persist` middleware for localStorage/sessionStorage
+- Keep stores small and domain-specific
+- Computed values should be in the store, not components
+
+## Common Utilities
+
+### cn() - ClassName Utility
+
+```tsx
+import { cn } from "@/lib/utils"
+
+<div className={cn("base-classes", condition && "conditional", className)} />
+```
+
+Combines `clsx` and `tailwind-merge` for optimal className handling.
+
+## Development Commands
+
+- `pnpm dev` - Start dev server (http://localhost:3000)
 - `pnpm build` - Production build
 - `pnpm lint` - Run ESLint
-- Development server runs on http://localhost:3000
 
-## Best Practices
+## Code Quality Checklist
 
-1. **Component Composition**: Prefer composition over prop drilling
-2. **Type Safety**: Leverage TypeScript for compile-time safety
-3. **Accessibility First**: Build with a11y in mind from the start
-4. **Performance**: Optimize images, fonts, and bundle size
-5. **Consistency**: Follow shadcn/ui patterns for new components
-6. **Dark Mode**: Always test both light and dark themes
-7. **Responsive Design**: Mobile-first approach with Tailwind breakpoints
+Before completing any component work, verify:
+
+- [ ] No `forwardRef` usage (React 19)
+- [ ] Uses CVA for variants
+- [ ] Supports `className` prop override
+- [ ] Works in both light and dark modes
+- [ ] Keyboard accessible with visible focus states
+- [ ] TypeScript strict mode passes
+- [ ] Uses path aliases (@/components, @/lib, etc.)
+- [ ] Follows shadcn/ui patterns
+- [ ] Responsive on mobile, tablet, desktop
+- [ ] Uses semantic color tokens (not hardcoded colors)

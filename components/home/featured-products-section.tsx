@@ -4,6 +4,7 @@ import { ProductCard, type ProductCardData } from '@/components/product/product-
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart-store'
+import { toast } from 'sonner'
 
 type FeaturedProductsSectionProps = {
   products: ProductCardData[]
@@ -22,6 +23,11 @@ export function FeaturedProductsSection({ products }: FeaturedProductsSectionPro
         image: product.image,
         quantity: 1,
       })
+      
+      // Show success toast
+      toast.success('Đã thêm vào giỏ hàng', {
+        description: product.name,
+      })
     }
   }
 
@@ -31,7 +37,7 @@ export function FeaturedProductsSection({ products }: FeaturedProductsSectionPro
         {/* Section header */}
         <div className="flex items-center justify-between mb-8 md:mb-12">
           <div className="space-y-2">
-            <h2 className="text-h2-mobile md:text-h2">Sản phẩm nổi bật</h2>
+            <h2 className="text-h2-mobile md:text-h2 text-foreground">Sản phẩm nổi bật</h2>
             <p className="text-sm text-muted-foreground">
               Những sản phẩm được yêu thích nhất
             </p>
@@ -51,7 +57,7 @@ export function FeaturedProductsSection({ products }: FeaturedProductsSectionPro
             <ProductCard.Provider key={product.id} product={product}>
               <ProductCard.Frame href={`/products/${product.id}`}>
                 <ProductCard.Image />
-                <ProductCard.Content>
+                <ProductCard.Content className="p-4">
                   <ProductCard.Title />
                   <ProductCard.Rating />
                   <ProductCard.Footer>
@@ -68,7 +74,7 @@ export function FeaturedProductsSection({ products }: FeaturedProductsSectionPro
         <div className="mt-8 flex justify-center md:hidden">
           <Link
             href="/products"
-            className="touch-target px-6 py-3 bg-transparent text-foreground border-2 border-border rounded-md transition-colors duration-200 hover:bg-muted hover:border-foreground cursor-pointer inline-flex items-center gap-2 font-medium"
+            className="h-10 px-6 bg-transparent text-foreground border-2 border-border rounded-full transition-all hover:bg-muted hover:border-foreground active:scale-[0.98] cursor-pointer inline-flex items-center gap-2 font-medium"
           >
             Xem tất cả sản phẩm
             <ArrowRight className="h-4 w-4" />

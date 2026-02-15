@@ -9,11 +9,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 py-12 md:py-16">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="text-h3 font-semibold">Zent</h3>
+            <h3 className="text-h3 font-semibold text-foreground">Zent</h3>
             <p className="text-sm text-muted-foreground">
               Thời trang nam tối giản, chất lượng cao. Phong cách hiện đại cho người đàn ông Việt.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 touch-spacing">
               <Link
                 href="https://facebook.com"
                 className="touch-target flex items-center justify-center hover:text-accent transition-colors cursor-pointer"
@@ -33,7 +33,7 @@ export function Footer() {
 
           {/* Products */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold">Sản phẩm</h4>
+            <h4 className="text-sm font-semibold text-foreground">Sản phẩm</h4>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -72,7 +72,7 @@ export function Footer() {
 
           {/* Support */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold">Hỗ trợ</h4>
+            <h4 className="text-sm font-semibold text-foreground">Hỗ trợ</h4>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -111,7 +111,7 @@ export function Footer() {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold">Liên hệ</h4>
+            <h4 className="text-sm font-semibold text-foreground">Liên hệ</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <Phone className="h-4 w-4 mt-0.5 text-muted-foreground" />

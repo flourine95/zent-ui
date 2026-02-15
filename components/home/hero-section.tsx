@@ -12,7 +12,7 @@ export function HeroSection() {
           </div>
 
           {/* Heading */}
-          <h1 className="text-display-mobile md:text-display max-w-4xl">
+          <h1 className="text-display-mobile md:text-display text-foreground max-w-4xl">
             Thời trang nam tối giản
             <br />
             <span className="text-accent">Phong cách hiện đại</span>
@@ -28,14 +28,14 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row items-center gap-4 touch-spacing">
             <Link
               href="/products"
-              className="touch-target px-8 py-4 bg-accent text-accent-foreground rounded-md shadow-md transition-colors duration-200 hover:bg-accent/90 focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 cursor-pointer inline-flex items-center gap-2 font-medium"
+              className="h-12 px-8 bg-accent text-accent-foreground rounded-full shadow-md transition-all hover:bg-accent/90 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 cursor-pointer inline-flex items-center gap-2 font-semibold"
             >
               Khám phá ngay
               <ArrowRight className="h-5 w-5" />
             </Link>
             <Link
               href="/collections"
-              className="touch-target px-8 py-4 bg-transparent text-foreground border-2 border-border rounded-md transition-colors duration-200 hover:bg-muted hover:border-foreground focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 cursor-pointer inline-flex items-center gap-2 font-medium"
+              className="h-12 px-8 bg-transparent text-foreground border-2 border-border rounded-full transition-all hover:bg-muted hover:border-foreground active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 cursor-pointer inline-flex items-center gap-2 font-medium"
             >
               Xem bộ sưu tập
             </Link>

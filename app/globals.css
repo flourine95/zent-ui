@@ -374,3 +374,40 @@
     font-weight: 600;
   }
 }
+
+/* Toast customization */
+[data-sonner-toast] {
+  font-family: var(--font-body) !important;
+}
+
+[data-sonner-toast][data-styled="true"] {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--card-foreground) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: var(--foreground) !important;
+  font-weight: 500 !important;
+}
+
+[data-sonner-toast] [data-description] {
+  color: var(--muted-foreground) !important;
+}
+
+[data-sonner-toast] [data-button] {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+[data-sonner-toast][data-type="success"] [data-icon] {
+  color: var(--success) !important;
+}
+
+[data-sonner-toast][data-type="error"] [data-icon] {
+  color: var(--destructive) !important;
+}
+
+[data-sonner-toast][data-type="warning"] [data-icon] {
+  color: var(--warning) !important;
+}

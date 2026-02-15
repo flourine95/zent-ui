@@ -20,7 +20,7 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
       <div className="container mx-auto px-4 md:px-6">
         {/* Section header */}
         <div className="text-center mb-8 md:mb-12 space-y-2">
-          <h2 className="text-h2-mobile md:text-h2">Danh mục sản phẩm</h2>
+          <h2 className="text-h2-mobile md:text-h2 text-foreground">Danh mục sản phẩm</h2>
           <p className="text-sm text-muted-foreground">
             Khám phá bộ sưu tập đa dạng của chúng tôi
           </p>
@@ -34,7 +34,7 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
               href={`/products?category=${category.slug}`}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-square overflow-hidden rounded-lg bg-card border border-border shadow-soft hover:shadow-soft-hover transition-all duration-200 hover:-translate-y-0.5">
+              <div className="relative aspect-square overflow-hidden rounded-lg bg-card border border-border shadow-soft hover:shadow-soft-hover transition-smooth hover:-translate-y-0.5">
                 <Image
                   src={category.image}
                   alt={category.name}

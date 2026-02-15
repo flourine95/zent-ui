@@ -38,7 +38,7 @@ export function FeaturesSection() {
                 <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center">
                   <Icon className="h-6 w-6 text-accent" />
                 </div>
-                <h3 className="text-base font-semibold">{feature.title}</h3>
+                <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground">
                   {feature.description}
                 </p>

@@ -7,6 +7,10 @@ export type CartItem = {
   price: number
   image: string
   quantity: number
+  variant?: {
+    size?: string
+    color?: string
+  }
 }
 
 type CartStore = {
