@@ -1,11 +1,13 @@
-import { HeroSection } from '@/components/home/hero-section'
-import { FeaturedProductsSection } from '@/components/home/featured-products-section'
-import { CategoriesSection } from '@/components/home/categories-section'
-import { FeaturesSection } from '@/components/home/features-section'
-import type { ProductCardData } from '@/components/product/product-card'
+import { ProductsPage } from '@/components/products/products-page'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Sản phẩm - Zent',
+  description: 'Khám phá bộ sưu tập thời trang nam tối giản, chất lượng cao từ Zent',
+}
 
 // Mock data - replace with actual data fetching
-const featuredProducts: ProductCardData[] = [
+const products = [
   {
     id: '1',
     name: 'Áo thun nam basic trắng',
@@ -17,6 +19,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 1234,
     inStock: true,
     freeShipping: true,
+    category: 'ao-thun',
     badge: 'NEW',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     colors: [
@@ -35,6 +38,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 856,
     inStock: true,
     freeShipping: true,
+    category: 'ao-polo',
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'Xanh navy', value: 'navy', hex: '#1E3A8A' },
@@ -53,6 +57,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 2341,
     inStock: true,
     freeShipping: true,
+    category: 'quan',
     badge: 'HOT',
     sizes: ['29', '30', '31', '32', '33'],
     colors: [
@@ -70,6 +75,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 1567,
     inStock: true,
     freeShipping: true,
+    category: 'ao-so-mi',
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
       { name: 'Trắng', value: 'white', hex: '#FFFFFF' },
@@ -86,6 +92,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 987,
     inStock: true,
     freeShipping: true,
+    category: 'quan',
     sizes: ['29', '30', '31', '32', '33', '34'],
     colors: [
       { name: 'Be', value: 'beige', hex: '#D4C5B9' },
@@ -103,6 +110,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 654,
     inStock: true,
     freeShipping: true,
+    category: 'ao-polo',
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
       { name: 'Đen', value: 'black', hex: '#000000' },
@@ -121,6 +129,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 432,
     inStock: false,
     freeShipping: false,
+    category: 'quan',
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
       { name: 'Xanh navy', value: 'navy', hex: '#1E3A8A' },
@@ -138,6 +147,7 @@ const featuredProducts: ProductCardData[] = [
     reviewCount: 3210,
     inStock: true,
     freeShipping: true,
+    category: 'ao-khoac',
     badge: 'BEST SELLER',
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
@@ -145,46 +155,90 @@ const featuredProducts: ProductCardData[] = [
       { name: 'Xanh rêu', value: 'olive', hex: '#84A98C' },
     ],
   },
+  {
+    id: '9',
+    name: 'Áo thun nam đen',
+    price: 299000,
+    image: '/placeholder.svg',
+    hoverImage: '/placeholder.svg',
+    rating: 4.6,
+    reviewCount: 1890,
+    inStock: true,
+    freeShipping: true,
+    category: 'ao-thun',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: [
+      { name: 'Đen', value: 'black', hex: '#000000' },
+      { name: 'Trắng', value: 'white', hex: '#FFFFFF' },
+      { name: 'Xám', value: 'gray', hex: '#9CA3AF' },
+    ],
+  },
+  {
+    id: '10',
+    name: 'Quần jogger nam',
+    price: 449000,
+    image: '/placeholder.svg',
+    hoverImage: '/placeholder.svg',
+    rating: 4.5,
+    reviewCount: 756,
+    inStock: true,
+    freeShipping: true,
+    category: 'quan',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: [
+      { name: 'Đen', value: 'black', hex: '#000000' },
+      { name: 'Xám', value: 'gray', hex: '#9CA3AF' },
+      { name: 'Xanh navy', value: 'navy', hex: '#1E3A8A' },
+    ],
+  },
+  {
+    id: '11',
+    name: 'Áo hoodie nam',
+    price: 599000,
+    image: '/placeholder.svg',
+    hoverImage: '/placeholder.svg',
+    rating: 4.7,
+    reviewCount: 1234,
+    inStock: true,
+    freeShipping: true,
+    category: 'ao-khoac',
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    colors: [
+      { name: 'Đen', value: 'black', hex: '#000000' },
+      { name: 'Xám', value: 'gray', hex: '#9CA3AF' },
+      { name: 'Xanh navy', value: 'navy', hex: '#1E3A8A' },
+      { name: 'Be', value: 'beige', hex: '#D4C5B9' },
+    ],
+  },
+  {
+    id: '12',
+    name: 'Áo thun nam xám',
+    price: 299000,
+    image: '/placeholder.svg',
+    hoverImage: '/placeholder.svg',
+    rating: 4.4,
+    reviewCount: 890,
+    inStock: true,
+    freeShipping: true,
+    category: 'ao-thun',
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: [
+      { name: 'Xám', value: 'gray', hex: '#9CA3AF' },
+      { name: 'Đen', value: 'black', hex: '#000000' },
+      { name: 'Trắng', value: 'white', hex: '#FFFFFF' },
+    ],
+  },
 ]
 
 const categories = [
-  {
-    id: '1',
-    name: 'Áo thun',
-    slug: 'ao-thun',
-    image: '/placeholder.svg',
-    productCount: 156,
-  },
-  {
-    id: '2',
-    name: 'Áo polo',
-    slug: 'ao-polo',
-    image: '/placeholder.svg',
-    productCount: 89,
-  },
-  {
-    id: '3',
-    name: 'Quần',
-    slug: 'quan',
-    image: '/placeholder.svg',
-    productCount: 234,
-  },
-  {
-    id: '4',
-    name: 'Phụ kiện',
-    slug: 'phu-kien',
-    image: '/placeholder.svg',
-    productCount: 67,
-  },
+  { id: 'all', name: 'Tất cả', slug: 'all' },
+  { id: 'ao-thun', name: 'Áo thun', slug: 'ao-thun' },
+  { id: 'ao-polo', name: 'Áo polo', slug: 'ao-polo' },
+  { id: 'ao-so-mi', name: 'Áo sơ mi', slug: 'ao-so-mi' },
+  { id: 'quan', name: 'Quần', slug: 'quan' },
+  { id: 'ao-khoac', name: 'Áo khoác', slug: 'ao-khoac' },
 ]
 
-export default function Home() {
-  return (
-    <main>
-      <HeroSection />
-      <FeaturesSection />
-      <FeaturedProductsSection products={featuredProducts} />
-      <CategoriesSection categories={categories} />
-    </main>
-  )
+export default function ProductsPage() {
+  return <ProductsPage products={products} categories={categories} />
 }
