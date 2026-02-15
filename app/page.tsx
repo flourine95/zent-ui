@@ -1,65 +1,137 @@
-import Image from "next/image";
+import { HeroSection } from '@/components/home/hero-section'
+import { FeaturedProductsSection } from '@/components/home/featured-products-section'
+import { CategoriesSection } from '@/components/home/categories-section'
+import { FeaturesSection } from '@/components/home/features-section'
+import type { ProductCardData } from '@/components/product/product-card'
+
+// Placeholder image data URL
+const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI0U1RTVFNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNzM3MzczIj5Qcm9kdWN0IEltYWdlPC90ZXh0Pjwvc3ZnPg=='
+
+// Mock data - replace with actual data fetching
+const featuredProducts: ProductCardData[] = [
+  {
+    id: '1',
+    name: 'Áo thun nam basic trắng',
+    price: 299000,
+    originalPrice: 399000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.5,
+    reviewCount: 1234,
+    inStock: true,
+    freeShipping: true,
+  },
+  {
+    id: '2',
+    name: 'Áo polo nam cao cấp',
+    price: 399000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.8,
+    reviewCount: 856,
+    inStock: true,
+    freeShipping: true,
+  },
+  {
+    id: '3',
+    name: 'Quần jean nam slim fit',
+    price: 599000,
+    originalPrice: 799000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.6,
+    reviewCount: 2341,
+    inStock: true,
+    freeShipping: true,
+  },
+  {
+    id: '4',
+    name: 'Áo sơ mi nam trắng',
+    price: 449000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.7,
+    reviewCount: 1567,
+    inStock: true,
+    freeShipping: true,
+  },
+  {
+    id: '5',
+    name: 'Quần kaki nam',
+    price: 499000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.5,
+    reviewCount: 987,
+    inStock: true,
+    freeShipping: true,
+  },
+  {
+    id: '6',
+    name: 'Áo thun polo basic',
+    price: 349000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.4,
+    reviewCount: 654,
+    inStock: true,
+    freeShipping: true,
+  },
+  {
+    id: '7',
+    name: 'Quần short nam',
+    price: 299000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.3,
+    reviewCount: 432,
+    inStock: false,
+    freeShipping: false,
+  },
+  {
+    id: '8',
+    name: 'Áo khoác bomber',
+    price: 799000,
+    originalPrice: 999000,
+    image: PLACEHOLDER_IMAGE,
+    rating: 4.9,
+    reviewCount: 3210,
+    inStock: true,
+    freeShipping: true,
+  },
+]
+
+const categories = [
+  {
+    id: '1',
+    name: 'Áo thun',
+    slug: 'ao-thun',
+    image: PLACEHOLDER_IMAGE,
+    productCount: 156,
+  },
+  {
+    id: '2',
+    name: 'Áo polo',
+    slug: 'ao-polo',
+    image: PLACEHOLDER_IMAGE,
+    productCount: 89,
+  },
+  {
+    id: '3',
+    name: 'Quần',
+    slug: 'quan',
+    image: PLACEHOLDER_IMAGE,
+    productCount: 234,
+  },
+  {
+    id: '4',
+    name: 'Phụ kiện',
+    slug: 'phu-kien',
+    image: PLACEHOLDER_IMAGE,
+    productCount: 67,
+  },
+]
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+    <main>
+      <HeroSection />
+      <FeaturesSection />
+      <FeaturedProductsSection products={featuredProducts} />
+      <CategoriesSection categories={categories} />
+    </main>
+  )
 }
