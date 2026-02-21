@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { ProductCard, type ProductCardData } from '@/components/product/product-card'
 import { useCartStore } from '@/lib/store/cart-store'
 import { toast } from 'sonner'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ProductFilters, type FilterState } from './product-filters'
 import { ActiveFilters } from './active-filters'
@@ -281,25 +281,28 @@ export function ProductsPage({ products, categories }: ProductsPageClientProps) 
               
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground whitespace-nowrap">Hiển thị:</span>
-                <select
-                  value={itemsPerPage}
-                  onChange={(e) => {
-                    setItemsPerPage(Number(e.target.value))
-                    setCurrentPage(1)
-                  }}
-                  className="h-9 pl-3 pr-9 rounded-md border border-input bg-background text-sm shadow-xs transition-colors hover:bg-accent/50 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus:border-ring cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px_16px] bg-[right_8px_center] bg-no-repeat [&:focus]:bg-background"
-                >
-                  {ITEMS_PER_PAGE_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option} sản phẩm
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value))
+                      setCurrentPage(1)
+                    }}
+                    className="select-custom"
+                  >
+                    {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option} sản phẩm
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                </div>
               </div>
             </div>
 
             {/* Products Grid */}
-            <div className="flex-1 flex flex-col min-h-[600px]">
+            <div className="flex-1 flex flex-col min-h-150">
               {currentProducts.length === 0 ? (
                 <div className="text-center py-16 mt-8">
                   <p className="text-muted-foreground mb-4">Không tìm thấy sản phẩm nào</p>

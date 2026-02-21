@@ -199,7 +199,7 @@ export function ProductFilters({
                 key={size}
                 onClick={() => toggleArrayFilter('sizes', size)}
                 className={cn(
-                  'min-w-[3rem] px-4 py-2 rounded-full border-2 text-sm font-medium transition-all',
+                  'min-w-12 px-4 py-2 rounded-full border-2 text-sm font-medium transition-all',
                   filters.sizes.includes(size)
                     ? 'border-accent bg-accent text-accent-foreground'
                     : 'border-border hover:border-muted-foreground'
@@ -311,7 +311,7 @@ export function ProductFilters({
                 <SlidersHorizontal className="h-4 w-4" />
                 Bộ lọc
                 {activeFilterCount > 0 && (
-                  <span className="flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
+                  <span className="flex items-center justify-center min-w-5 h-5 px-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-full">
                     {activeFilterCount}
                   </span>
                 )}

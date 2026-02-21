@@ -87,7 +87,7 @@ function ProductCardImage({ className, priority = false }: ProductCardImageProps
 
   return (
     <div 
-      className={cn('relative aspect-[3/4] overflow-hidden bg-muted', className)}
+      className={cn('relative aspect-3/4 overflow-hidden bg-muted', className)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -119,7 +119,7 @@ function ProductCardImage({ className, priority = false }: ProductCardImageProps
       {product.sizes && product.sizes.length > 0 && (
         <div className={cn(
           'absolute inset-x-0 bottom-0 h-2/5',
-          'bg-gradient-to-t from-background/95 via-background/80 to-transparent backdrop-blur-sm',
+          'bg-linear-to-t from-background/95 via-background/80 to-transparent backdrop-blur-sm',
           'flex flex-col items-center justify-end pb-4 px-3 gap-2',
           'transition-all duration-300',
           isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

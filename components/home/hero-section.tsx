@@ -63,8 +63,8 @@ export function HeroSection() {
 
       {/* Decorative gradient */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-1/2 -right-1/4 h-[500px] w-[500px] rounded-full bg-accent/5 blur-3xl" />
-        <div className="absolute -bottom-1/2 -left-1/4 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute -top-1/2 -right-1/4 h-125 w-125 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute -bottom-1/2 -left-1/4 h-125 w-125 rounded-full bg-primary/5 blur-3xl" />
       </div>
     </section>
   )

@@ -318,7 +318,7 @@ export function ProductDetail({ product }: ProductDetailClientProps) {
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     className={cn(
-                      'min-w-[3rem] px-4 py-2 rounded-full border-2 text-sm font-medium transition-all',
+                      'min-w-12 px-4 py-2 rounded-full border-2 text-sm font-medium transition-all',
                       selectedSize === size
                         ? 'border-accent bg-accent text-accent-foreground'
                         : 'border-border hover:border-muted-foreground'
@@ -377,7 +377,7 @@ export function ProductDetail({ product }: ProductDetailClientProps) {
             {/* Trust Badges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0">
                   <Truck className="h-5 w-5 text-success" />
                 </div>
                 <div>
@@ -386,7 +386,7 @@ export function ProductDetail({ product }: ProductDetailClientProps) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center shrink-0">
                   <RefreshCw className="h-5 w-5 text-success" />
                 </div>
                 <div>
@@ -395,7 +395,7 @@ export function ProductDetail({ product }: ProductDetailClientProps) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center shrink-0">
                   <Shield className="h-5 w-5 text-warning" />
                 </div>
                 <div>

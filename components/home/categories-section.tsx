@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
 
 type Category = {
   id: string
@@ -42,7 +41,7 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4 space-y-1">
                   <h3 className="text-base md:text-lg font-semibold text-foreground">
                     {category.name}
