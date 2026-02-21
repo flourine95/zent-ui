@@ -239,6 +239,6 @@ const categories = [
   { id: 'ao-khoac', name: 'Áo khoác', slug: 'ao-khoac' },
 ]
 
-export default function ProductsPage() {
+export default function Page() {
   return <ProductsPage products={products} categories={categories} />
 }

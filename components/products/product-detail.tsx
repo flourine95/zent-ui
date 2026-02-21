@@ -8,11 +8,24 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Star, ShoppingCart, Truck, RefreshCw, Shield, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ProductReviews } from './product-reviews'
+import { SuggestedProducts } from './suggested-products'
+import type { ProductCardData } from '@/components/product/product-card'
 
 type Color = {
   name: string
   value: string
   hex: string
+}
+
+type Review = {
+  id: string
+  userName: string
+  rating: number
+  date: string
+  comment: string
+  helpful: number
+  verified: boolean
 }
 
 type Product = {
@@ -30,6 +43,8 @@ type Product = {
   features: string[]
   sizes: string[]
   colors: Color[]
+  reviews?: Review[]
+  suggestedProducts?: ProductCardData[]
 }
 
 type ProductDetailClientProps = {
@@ -404,6 +419,24 @@ export function ProductDetail({ product }: ProductDetailClientProps) {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        {product.reviews && product.reviews.length > 0 && (
+          <div className="mt-16 pt-16 border-t border-border">
+            <ProductReviews
+              reviews={product.reviews}
+              averageRating={product.rating}
+              totalReviews={product.reviewCount}
+            />
+          </div>
+        )}
+
+        {/* Suggested Products */}
+        {product.suggestedProducts && product.suggestedProducts.length > 0 && (
+          <div className="mt-16 pt-16 border-t border-border">
+            <SuggestedProducts products={product.suggestedProducts} />
+          </div>
+        )}
       </div>
     </div>
   )
