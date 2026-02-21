@@ -3,13 +3,9 @@ import { ArrowRight } from 'lucide-react'
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-muted/50 to-background">
+    <section className="relative overflow-hidden bg-linear-to-b from-muted/50 to-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center justify-center text-center py-16 md:py-24 lg:py-32 space-y-8">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20">
-            <span className="text-sm font-medium text-accent">Bộ sưu tập mới</span>
-          </div>
 
           {/* Heading */}
           <h1 className="text-display-mobile md:text-display text-foreground max-w-4xl">
