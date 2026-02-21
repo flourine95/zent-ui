@@ -6,13 +6,6 @@ import { useCartStore } from '@/lib/store/cart-store'
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { ProductFilters, type FilterState } from './product-filters'
 import { ActiveFilters } from './active-filters'
 import { ProductSort, type SortOption } from './product-sort'
@@ -287,25 +280,21 @@ export function ProductsPage({ products, categories }: ProductsPageClientProps) 
               />
               
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Hiển thị:</span>
-                <Select
-                  value={itemsPerPage.toString()}
-                  onValueChange={(value) => {
-                    setItemsPerPage(Number(value))
+                <span className="text-sm text-muted-foreground whitespace-nowrap">Hiển thị:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value))
                     setCurrentPage(1)
                   }}
+                  className="h-9 pl-3 pr-9 rounded-md border border-input bg-background text-sm shadow-xs transition-colors hover:bg-accent/50 focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus:border-ring cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px_16px] bg-[right_8px_center] bg-no-repeat [&:focus]:bg-background"
                 >
-                  <SelectTrigger className="w-[140px] h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ITEMS_PER_PAGE_OPTIONS.map((option) => (
-                      <SelectItem key={option} value={option.toString()}>
-                        {option} sản phẩm
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option} sản phẩm
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
