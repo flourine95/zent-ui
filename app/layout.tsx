@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Toaster } from "sonner";
+import React from "react";
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["vietnamese", "latin"],
@@ -48,8 +49,8 @@ export default function RootLayout({
               <div className="flex-1">{children}</div>
               <Footer />
             </div>
-            <Toaster 
-              position="bottom-center" 
+            <Toaster
+              position="bottom-center"
               toastOptions={{
                 style: {
                   background: 'var(--card)',

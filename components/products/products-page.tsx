@@ -1,11 +1,21 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { ProductCard, type ProductCardData } from '@/components/product/product-card'
 import { useCartStore } from '@/lib/store/cart-store'
 import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { ProductFilters, type FilterState } from './product-filters'
+import { ActiveFilters } from './active-filters'
+import { ProductSort, type SortOption } from './product-sort'
 
 type Category = {
   id: string
@@ -18,16 +28,50 @@ type ProductsPageClientProps = {
   categories: Category[]
 }
 
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'rating' | 'newest'
-
-const ITEMS_PER_PAGE = 12
+const ITEMS_PER_PAGE_OPTIONS = [9, 12, 24, 48] as const
 
 export function ProductsPage({ products, categories }: ProductsPageClientProps) {
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const addItem = useCartStore((state) => state.addItem)
+  const [itemsPerPage, setItemsPerPage] = useState<number>(12)
+  
+  // Calculate price range from products
+  const priceRange = useMemo<[number, number]>(() => {
+    const prices = products.map((p) => p.price)
+    return [Math.min(...prices), Math.max(...prices)]
+  }, [products])
+
+  // Extract unique sizes and colors
+  const { availableSizes, availableColors } = useMemo(() => {
+    const sizesSet = new Set<string>()
+    const colorsMap = new Map<string, { name: string; value: string; hex: string }>()
+
+    products.forEach((product) => {
+      product.sizes?.forEach((size) => sizesSet.add(size))
+      product.colors?.forEach((color) => {
+        if (!colorsMap.has(color.value)) {
+          colorsMap.set(color.value, color)
+        }
+      })
+    })
+
+    return {
+      availableSizes: Array.from(sizesSet).sort(),
+      availableColors: Array.from(colorsMap.values()),
+    }
+  }, [products])
+
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    priceRange,
+    categories: [],
+    sizes: [],
+    colors: [],
+    inStock: false,
+    freeShipping: false,
+  })
   const [sortBy, setSortBy] = useState<SortOption>('default')
   const [currentPage, setCurrentPage] = useState(1)
   const [productSelections, setProductSelections] = useState<Record<string, { color?: string; size?: string }>>({})
-  const addItem = useCartStore((state) => state.addItem)
 
   const handleColorSelect = (productId: string, colorValue: string) => {
     setProductSelections((prev) => ({
@@ -48,7 +92,6 @@ export function ProductsPage({ products, categories }: ProductsPageClientProps) 
       },
     }))
 
-    // Auto add to cart when size is selected
     const product = products.find((p) => p.id === productId)
     if (product) {
       const selectedColor = productSelections[productId]?.color || product.colors?.[0]?.value
@@ -72,13 +115,92 @@ export function ProductsPage({ products, categories }: ProductsPageClientProps) 
     }
   }
 
+  const handleRemoveFilter = useCallback(
+    (key: keyof FilterState, value?: string) => {
+      if (key === 'search') {
+        setFilters((prev) => ({ ...prev, search: '' }))
+      } else if (key === 'priceRange') {
+        setFilters((prev) => ({ ...prev, priceRange }))
+      } else if (key === 'inStock' || key === 'freeShipping') {
+        setFilters((prev) => ({ ...prev, [key]: false }))
+      } else if (value && (key === 'categories' || key === 'sizes' || key === 'colors')) {
+        setFilters((prev) => ({
+          ...prev,
+          [key]: prev[key].filter((v) => v !== value),
+        }))
+      }
+      setCurrentPage(1)
+    },
+    [priceRange]
+  )
+
+  const handleClearAllFilters = useCallback(() => {
+    setFilters({
+      search: '',
+      priceRange,
+      categories: [],
+      sizes: [],
+      colors: [],
+      inStock: false,
+      freeShipping: false,
+    })
+    setCurrentPage(1)
+  }, [priceRange])
+
+  const handleFiltersChange = useCallback((newFilters: FilterState) => {
+    setFilters(newFilters)
+    setCurrentPage(1)
+  }, [])
+
+  const handleSortChange = useCallback((sort: SortOption) => {
+    setSortBy(sort)
+    setCurrentPage(1)
+  }, [])
+
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = products
 
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter((p) => p.category === selectedCategory)
+    // Search
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase()
+      filtered = filtered.filter((p) =>
+        p.name.toLowerCase().includes(searchLower)
+      )
+    }
+
+    // Price range
+    filtered = filtered.filter(
+      (p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
+    )
+
+    // Categories
+    if (filters.categories.length > 0) {
+      filtered = filtered.filter((p) => p.category && filters.categories.includes(p.category))
+    }
+
+    // Sizes
+    if (filters.sizes.length > 0) {
+      filtered = filtered.filter((p) =>
+        p.sizes?.some((size) => filters.sizes.includes(size))
+      )
+    }
+
+    // Colors
+    if (filters.colors.length > 0) {
+      filtered = filtered.filter((p) =>
+        p.colors?.some((color) => filters.colors.includes(color.value))
+      )
+    }
+
+    // In stock
+    if (filters.inStock) {
+      filtered = filtered.filter((p) => p.inStock)
+    }
+
+    // Free shipping
+    if (filters.freeShipping) {
+      filtered = filtered.filter((p) => p.freeShipping)
     }
 
     // Sort
@@ -93,6 +215,12 @@ export function ProductsPage({ products, categories }: ProductsPageClientProps) 
       case 'rating':
         sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0))
         break
+      case 'name-asc':
+        sorted.sort((a, b) => a.name.localeCompare(b.name, 'vi'))
+        break
+      case 'name-desc':
+        sorted.sort((a, b) => b.name.localeCompare(a.name, 'vi'))
+        break
       case 'newest':
         // In real app, sort by createdAt
         break
@@ -101,24 +229,13 @@ export function ProductsPage({ products, categories }: ProductsPageClientProps) 
     }
 
     return sorted
-  }, [products, selectedCategory, sortBy])
+  }, [products, filters, sortBy])
 
   // Pagination
-  const totalPages = Math.ceil(filteredAndSortedProducts.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const endIndex = startIndex + ITEMS_PER_PAGE
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
   const currentProducts = filteredAndSortedProducts.slice(startIndex, endIndex)
-
-  // Reset to page 1 when filters change
-  const handleCategoryChange = (slug: string) => {
-    setSelectedCategory(slug)
-    setCurrentPage(1)
-  }
-
-  const handleSortChange = (sort: SortOption) => {
-    setSortBy(sort)
-    setCurrentPage(1)
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -127,261 +244,178 @@ export function ProductsPage({ products, categories }: ProductsPageClientProps) 
         <div className="container mx-auto px-4 md:px-6 py-8">
           <h1 className="text-h1-mobile md:text-h1 text-foreground mb-2">Sản phẩm</h1>
           <p className="text-sm text-muted-foreground">
-            {filteredAndSortedProducts.length} sản phẩm
+            Khám phá bộ sưu tập thời trang nam tối giản
           </p>
         </div>
       </div>
 
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters - Desktop */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="sticky top-24 space-y-6">
-              {/* Categories */}
-              <div className="bg-card border border-border rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-foreground mb-4">Danh mục</h3>
-                <div className="space-y-1">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => handleCategoryChange(category.slug)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                        selectedCategory === category.slug
-                          ? 'bg-accent text-accent-foreground font-medium'
-                          : 'text-foreground hover:bg-muted'
-                      }`}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sort */}
-              <div className="bg-card border border-border rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-foreground mb-4">Sắp xếp</h3>
-                <div className="space-y-1">
-                  <button
-                    onClick={() => handleSortChange('default')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      sortBy === 'default'
-                        ? 'bg-accent text-accent-foreground font-medium'
-                        : 'text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    Mặc định
-                  </button>
-                  <button
-                    onClick={() => handleSortChange('price-asc')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      sortBy === 'price-asc'
-                        ? 'bg-accent text-accent-foreground font-medium'
-                        : 'text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    Giá thấp đến cao
-                  </button>
-                  <button
-                    onClick={() => handleSortChange('price-desc')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      sortBy === 'price-desc'
-                        ? 'bg-accent text-accent-foreground font-medium'
-                        : 'text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    Giá cao đến thấp
-                  </button>
-                  <button
-                    onClick={() => handleSortChange('rating')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      sortBy === 'rating'
-                        ? 'bg-accent text-accent-foreground font-medium'
-                        : 'text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    Đánh giá cao nhất
-                  </button>
-                </div>
-              </div>
+          {/* Sidebar Filters */}
+          <aside className="lg:w-72 shrink-0">
+            <div className="lg:sticky lg:top-24">
+              <ProductFilters
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                categories={categories}
+                availableSizes={availableSizes}
+                availableColors={availableColors}
+                priceRange={priceRange}
+                resultCount={filteredAndSortedProducts.length}
+              />
             </div>
           </aside>
 
           {/* Main Content */}
-          <div className="flex-1">
-            {/* Mobile Filters - Horizontal Scroll */}
-            <div className="lg:hidden mb-6 space-y-4">
-              {/* Categories */}
-              <div>
-                <h3 className="text-xs font-semibold text-muted-foreground mb-2 px-1">DANH MỤC</h3>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => handleCategoryChange(category.slug)}
-                      className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                        selectedCategory === category.slug
-                          ? 'bg-accent text-accent-foreground'
-                          : 'bg-card border border-border text-foreground hover:border-accent'
-                      }`}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <div className="flex-1 min-w-0 flex flex-col">
+            {/* Active Filters */}
+            <ActiveFilters
+              filters={filters}
+              onRemoveFilter={handleRemoveFilter}
+              onClearAll={handleClearAllFilters}
+              categories={categories}
+              availableColors={availableColors}
+              priceRange={priceRange}
+            />
 
-              {/* Sort */}
-              <div>
-                <h3 className="text-xs font-semibold text-muted-foreground mb-2 px-1">SẮP XẾP</h3>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  <button
-                    onClick={() => handleSortChange('default')}
-                    className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                      sortBy === 'default'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-accent'
-                    }`}
-                  >
-                    Mặc định
-                  </button>
-                  <button
-                    onClick={() => handleSortChange('price-asc')}
-                    className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                      sortBy === 'price-asc'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-accent'
-                    }`}
-                  >
-                    Giá ↑
-                  </button>
-                  <button
-                    onClick={() => handleSortChange('price-desc')}
-                    className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                      sortBy === 'price-desc'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-accent'
-                    }`}
-                  >
-                    Giá ↓
-                  </button>
-                  <button
-                    onClick={() => handleSortChange('rating')}
-                    className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                      sortBy === 'rating'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'bg-card border border-border text-foreground hover:border-accent'
-                    }`}
-                  >
-                    Đánh giá
-                  </button>
-                </div>
+            {/* Sort and Items Per Page */}
+            <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <ProductSort
+                value={sortBy}
+                onChange={handleSortChange}
+                resultCount={filteredAndSortedProducts.length}
+              />
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Hiển thị:</span>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={(value) => {
+                    setItemsPerPage(Number(value))
+                    setCurrentPage(1)
+                  }}
+                >
+                  <SelectTrigger className="w-[140px] h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ITEMS_PER_PAGE_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option.toString()}>
+                        {option} sản phẩm
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             {/* Products Grid */}
-            {currentProducts.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground mb-4">Không tìm thấy sản phẩm nào</p>
-                <Button onClick={() => handleCategoryChange('all')}>
-                  Xem tất cả sản phẩm
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {currentProducts.map((product) => {
-                    const selection = productSelections[product.id] || {}
-                    return (
-                      <ProductCard.Provider 
-                        key={product.id} 
-                        product={{
-                          ...product,
-                          selectedColor: selection.color || product.colors?.[0]?.value,
-                          selectedSize: selection.size,
-                          onColorSelect: (colorValue) => handleColorSelect(product.id, colorValue),
-                          onSizeSelect: (size) => handleSizeSelect(product.id, size),
-                        }}
-                      >
-                        <ProductCard.Frame href={`/products/${product.id}`}>
-                          <ProductCard.Image />
-                          <ProductCard.Content>
-                            <ProductCard.Colors />
-                            <ProductCard.Title />
-                            <ProductCard.Price />
-                          </ProductCard.Content>
-                        </ProductCard.Frame>
-                      </ProductCard.Provider>
-                    )
-                  })}
+            <div className="flex-1 flex flex-col min-h-[600px]">
+              {currentProducts.length === 0 ? (
+                <div className="text-center py-16 mt-8">
+                  <p className="text-muted-foreground mb-4">Không tìm thấy sản phẩm nào</p>
+                  <Button onClick={handleClearAllFilters}>Xóa bộ lọc</Button>
                 </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="mt-12 flex flex-col items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                        className="rounded-full"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </Button>
-
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                          // Show first, last, current, and adjacent pages
-                          if (
-                            page === 1 ||
-                            page === totalPages ||
-                            (page >= currentPage - 1 && page <= currentPage + 1)
-                          ) {
-                            return (
-                              <Button
-                                key={page}
-                                variant={currentPage === page ? 'default' : 'outline'}
-                                size="icon"
-                                onClick={() => setCurrentPage(page)}
-                                className="w-10 h-10 rounded-full"
-                              >
-                                {page}
-                              </Button>
-                            )
-                          } else if (page === currentPage - 2 || page === currentPage + 2) {
-                            return (
-                              <span key={page} className="px-2 text-muted-foreground">
-                                ...
-                              </span>
-                            )
-                          }
-                          return null
-                        })}
-                      </div>
-
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                        className="rounded-full"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    
-                    {/* Page info */}
-                    <p className="text-sm text-muted-foreground">
-                      Trang {currentPage} / {totalPages} ({filteredAndSortedProducts.length} sản phẩm)
-                    </p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mt-6">
+                    {currentProducts.map((product) => {
+                      const selection = productSelections[product.id] || {}
+                      return (
+                        <ProductCard.Provider
+                          key={product.id}
+                          product={{
+                            ...product,
+                            selectedColor: selection.color || product.colors?.[0]?.value,
+                            selectedSize: selection.size,
+                            onColorSelect: (colorValue) => handleColorSelect(product.id, colorValue),
+                            onSizeSelect: (size) => handleSizeSelect(product.id, size),
+                          }}
+                        >
+                          <ProductCard.Frame href={`/products/${product.id}`}>
+                            <ProductCard.Image />
+                            <ProductCard.Content>
+                              <ProductCard.Colors />
+                              <ProductCard.Title />
+                              <ProductCard.Price />
+                            </ProductCard.Content>
+                          </ProductCard.Frame>
+                        </ProductCard.Provider>
+                      )
+                    })}
                   </div>
-                )}
-              </>
-            )}
+
+                  {/* Pagination */}
+                  <div className="flex flex-col items-center gap-4 py-12 mt-auto border-t border-border">
+                    {totalPages > 1 ? (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className="rounded-full"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </Button>
+
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                              if (
+                                page === 1 ||
+                                page === totalPages ||
+                                (page >= currentPage - 1 && page <= currentPage + 1)
+                              ) {
+                                return (
+                                  <Button
+                                    key={page}
+                                    variant={currentPage === page ? 'default' : 'outline'}
+                                    size="icon"
+                                    onClick={() => setCurrentPage(page)}
+                                    className="w-10 h-10 rounded-full"
+                                  >
+                                    {page}
+                                  </Button>
+                                )
+                              } else if (page === currentPage - 2 || page === currentPage + 2) {
+                                return (
+                                  <span key={page} className="px-2 text-muted-foreground">
+                                    ...
+                                  </span>
+                                )
+                              }
+                              return null
+                            })}
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                            className="rounded-full"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <p className="text-sm text-muted-foreground">
+                          Trang {currentPage} / {totalPages} • {filteredAndSortedProducts.length} sản phẩm
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Hiển thị {filteredAndSortedProducts.length} sản phẩm
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
   )
 }
-
