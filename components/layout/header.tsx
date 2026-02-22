@@ -47,21 +47,23 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 touch-spacing">
-            <button
+            <Link
+              href="/search"
               className="touch-target flex items-center justify-center cursor-pointer hover:text-accent transition-colors"
               aria-label="Tìm kiếm"
             >
               <Search className="h-5 w-5" />
-            </button>
+            </Link>
 
             <ThemeToggle />
 
-            <button
+            <Link
+              href="/profile"
               className="touch-target flex items-center justify-center cursor-pointer hover:text-accent transition-colors"
               aria-label="Tài khoản"
             >
               <User className="h-5 w-5" />
-            </button>
+            </Link>
 
             <CartDrawer />
           </div>

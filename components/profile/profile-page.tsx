@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { User, Package, MapPin, Settings, ChevronRight } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { User, Package, MapPin, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type Tab = 'info' | 'orders' | 'addresses' | 'settings'
@@ -93,7 +94,7 @@ export function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <aside className="lg:col-span-1">
-            <nav className="space-y-1">
+            <nav className="space-y-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon
                 return (
@@ -101,15 +102,14 @@ export function ProfilePage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                      'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2',
                       activeTab === tab.id
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        ? 'border-accent text-foreground bg-muted/50'
+                        : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'
                     )}
                   >
                     <Icon className="h-5 w-5" />
                     <span className="flex-1 text-left">{tab.label}</span>
-                    <ChevronRight className="h-4 w-4" />
                   </button>
                 )
               })}
@@ -262,6 +262,9 @@ function AddressesTab({ addresses }: { addresses: Address[] }) {
 }
 
 function SettingsTab() {
+  const [orderNotifications, setOrderNotifications] = useState(true)
+  const [promotionNotifications, setPromotionNotifications] = useState(true)
+
   return (
     <div className="space-y-4">
       <div className="bg-card border border-border rounded-lg p-6">
@@ -289,25 +292,37 @@ function SettingsTab() {
 
       <div className="bg-card border border-border rounded-lg p-6">
         <h2 className="text-h3 mb-4">Thông báo</h2>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Email thông báo đơn hàng</p>
-              <p className="text-sm text-muted-foreground">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <Label htmlFor="order-notifications" className="font-medium cursor-pointer">
+                Email thông báo đơn hàng
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1">
                 Nhận thông báo về trạng thái đơn hàng
               </p>
             </div>
-            <input type="checkbox" defaultChecked className="h-5 w-5" />
+            <Switch
+              id="order-notifications"
+              checked={orderNotifications}
+              onCheckedChange={setOrderNotifications}
+            />
           </div>
           <Separator />
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Email khuyến mãi</p>
-              <p className="text-sm text-muted-foreground">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <Label htmlFor="promotion-notifications" className="font-medium cursor-pointer">
+                Email khuyến mãi
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1">
                 Nhận thông tin về ưu đãi và sản phẩm mới
               </p>
             </div>
-            <input type="checkbox" defaultChecked className="h-5 w-5" />
+            <Switch
+              id="promotion-notifications"
+              checked={promotionNotifications}
+              onCheckedChange={setPromotionNotifications}
+            />
           </div>
         </div>
       </div>
