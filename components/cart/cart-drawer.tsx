@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,11 +13,16 @@ type CartDrawerProps = {
 }
 
 export function CartDrawer({ children }: CartDrawerProps) {
+  const [mounted, setMounted] = useState(false)
   const items = useCartStore((state) => state.items)
   const removeItem = useCartStore((state) => state.removeItem)
   const updateQuantity = useCartStore((state) => state.updateQuantity)
   const getTotalPrice = useCartStore((state) => state.getTotalPrice())
   const getTotalItems = useCartStore((state) => state.getTotalItems())
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <Sheet>
@@ -27,7 +33,7 @@ export function CartDrawer({ children }: CartDrawerProps) {
             aria-label="Giỏ hàng"
           >
             <ShoppingCart className="h-5 w-5" />
-            {getTotalItems > 0 && (
+            {mounted && getTotalItems > 0 && (
               <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-semibold">
                 {getTotalItems > 9 ? '9+' : getTotalItems}
               </span>
