@@ -36,11 +36,11 @@ export function CartDrawer({ children }: CartDrawerProps) {
         )}
       </SheetTrigger>
 
-      <SheetContent className="flex flex-col w-full sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
+      <SheetContent className="flex flex-col w-full sm:max-w-lg p-0">
+        <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
+          <SheetTitle className="flex items-center gap-2 text-lg">
             <ShoppingCart className="h-5 w-5" />
-            Giỏ hàng ({getTotalItems} sản phẩm)
+            Giỏ hàng ({getTotalItems})
           </SheetTitle>
         </SheetHeader>
 
@@ -49,7 +49,7 @@ export function CartDrawer({ children }: CartDrawerProps) {
         ) : (
           <>
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto py-4 space-y-3">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
               {items.map((item) => (
                 <div
                   key={item.id}
@@ -141,7 +141,7 @@ export function CartDrawer({ children }: CartDrawerProps) {
             </div>
 
             {/* Footer */}
-            <div className="border-t border-border pt-4 space-y-3">
+            <div className="border-t border-border px-6 py-4 space-y-4 bg-background">
               {/* Subtotal */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Tạm tính</span>
@@ -152,36 +152,36 @@ export function CartDrawer({ children }: CartDrawerProps) {
 
               {/* Free Shipping Progress */}
               {getTotalPrice < 300000 ? (
-                <div className="space-y-2">
+                <div className="space-y-2 p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Miễn phí vận chuyển</span>
                     <span className="font-medium text-foreground">
-                      {getTotalPrice.toLocaleString('vi-VN')} / 300.000đ
+                      {((getTotalPrice / 300000) * 100).toFixed(0)}%
                     </span>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-accent transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-accent to-accent/80 transition-all duration-300"
                       style={{ width: `${Math.min((getTotalPrice / 300000) * 100, 100)}%` }}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Mua thêm <span className="font-semibold text-foreground">{(300000 - getTotalPrice).toLocaleString('vi-VN')}đ</span> để được miễn phí ship
+                    Mua thêm <span className="font-semibold text-accent">{(300000 - getTotalPrice).toLocaleString('vi-VN')}đ</span> để miễn phí ship
                   </p>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-xs text-success bg-success/10 px-3 py-2 rounded-lg">
-                  <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-success/10 border border-success/20">
+                  <svg className="h-5 w-5 flex-shrink-0 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="font-medium">Đơn hàng được miễn phí vận chuyển</span>
+                  <span className="text-sm font-medium text-success">Miễn phí vận chuyển</span>
                 </div>
               )}
 
               {/* Checkout Button */}
               <Button
                 asChild
-                className="w-full"
+                className="w-full h-12 text-base font-semibold"
                 size="lg"
               >
                 <Link href="/checkout">
