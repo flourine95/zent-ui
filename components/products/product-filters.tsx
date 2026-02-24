@@ -40,6 +40,195 @@ type ProductFiltersProps = {
   resultCount: number
 }
 
+type FilterContentProps = {
+  filters: FilterState
+  priceRange: [number, number]
+  categories: Array<{ id: string; name: string; slug: string }>
+  availableSizes: string[]
+  availableColors: Array<{ name: string; value: string; hex: string }>
+  openSections: {
+    price: boolean
+    category: boolean
+    size: boolean
+    color: boolean
+    other: boolean
+  }
+  onOpenSectionsChange: (sections: {
+    price: boolean
+    category: boolean
+    size: boolean
+    color: boolean
+    other: boolean
+  }) => void
+  onPriceRangeChange: (range: [number, number]) => void
+  onToggleArrayFilter: <K extends keyof Pick<FilterState, 'categories' | 'sizes' | 'colors'>>(
+    key: K,
+    value: string
+  ) => void
+  onUpdateFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
+}
+
+function FilterContent({
+  filters,
+  priceRange,
+  categories,
+  availableSizes,
+  availableColors,
+  openSections,
+  onOpenSectionsChange,
+  onPriceRangeChange,
+  onToggleArrayFilter,
+  onUpdateFilter,
+}: FilterContentProps) {
+  return (
+    <div className="space-y-6">
+      {/* Price Range */}
+      <Collapsible
+        open={openSections.price}
+        onOpenChange={(open) => onOpenSectionsChange({ ...openSections, price: open })}
+      >
+        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
+          <h3 className="text-sm font-semibold">Khoảng giá</h3>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.price ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4">
+          <PriceRangeSlider
+            min={priceRange[0]}
+            max={priceRange[1]}
+            value={filters.priceRange}
+            onChange={onPriceRangeChange}
+          />
+        </CollapsibleContent>
+      </Collapsible>
+
+      <div className="border-t border-border" />
+
+      {/* Categories */}
+      <Collapsible
+        open={openSections.category}
+        onOpenChange={(open) => onOpenSectionsChange({ ...openSections, category: open })}
+      >
+        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
+          <h3 className="text-sm font-semibold">Danh mục</h3>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.category ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4 space-y-3">
+          {categories.filter((c) => c.slug !== 'all').map((category) => (
+            <label
+              key={category.id}
+              className="flex items-center gap-3 cursor-pointer group"
+            >
+              <Checkbox
+                checked={filters.categories.includes(category.slug)}
+                onCheckedChange={() => onToggleArrayFilter('categories', category.slug)}
+              />
+              <span className="text-sm group-hover:text-foreground transition-colors">
+                {category.name}
+              </span>
+            </label>
+          ))}
+        </CollapsibleContent>
+      </Collapsible>
+
+      <div className="border-t border-border" />
+
+      {/* Sizes */}
+      <Collapsible
+        open={openSections.size}
+        onOpenChange={(open) => onOpenSectionsChange({ ...openSections, size: open })}
+      >
+        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
+          <h3 className="text-sm font-semibold">Kích thước</h3>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.size ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4">
+          <div className="flex flex-wrap gap-2">
+            {availableSizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => onToggleArrayFilter('sizes', size)}
+                className={cn(
+                  'min-w-12 px-4 py-2 rounded-full border-2 text-sm font-medium transition-all',
+                  filters.sizes.includes(size)
+                    ? 'border-accent bg-accent text-accent-foreground'
+                    : 'border-border hover:border-muted-foreground'
+                )}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      <div className="border-t border-border" />
+
+      {/* Colors */}
+      <Collapsible
+        open={openSections.color}
+        onOpenChange={(open) => onOpenSectionsChange({ ...openSections, color: open })}
+      >
+        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
+          <h3 className="text-sm font-semibold">Màu sắc</h3>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.color ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4">
+          <div className="flex flex-wrap gap-2">
+            {availableColors.map((color) => (
+              <button
+                key={color.value}
+                onClick={() => onToggleArrayFilter('colors', color.value)}
+                className={cn(
+                  'w-10 h-10 rounded-full transition-all',
+                  filters.colors.includes(color.value)
+                    ? 'border-[3px] border-accent scale-110'
+                    : 'border-2 border-border hover:border-muted-foreground'
+                )}
+                style={{ backgroundColor: color.hex }}
+                title={color.name}
+                aria-label={color.name}
+              />
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      <div className="border-t border-border" />
+
+      {/* Other Filters */}
+      <Collapsible
+        open={openSections.other}
+        onOpenChange={(open) => onOpenSectionsChange({ ...openSections, other: open })}
+      >
+        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
+          <h3 className="text-sm font-semibold">Khác</h3>
+          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.other ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4 space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <Checkbox
+              checked={filters.inStock}
+              onCheckedChange={(checked) => onUpdateFilter('inStock', !!checked)}
+            />
+            <span className="text-sm group-hover:text-foreground transition-colors">
+              Còn hàng
+            </span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <Checkbox
+              checked={filters.freeShipping}
+              onCheckedChange={(checked) => onUpdateFilter('freeShipping', !!checked)}
+            />
+            <span className="text-sm group-hover:text-foreground transition-colors">
+              Miễn phí vận chuyển
+            </span>
+          </label>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  )
+}
+
 export function ProductFilters({
   filters,
   onFiltersChange,
@@ -131,154 +320,6 @@ export function ProductFilters({
     setSearchValue('')
   }, [onFiltersChange, priceRange])
 
-  const FilterContent = () => (
-    <div className="space-y-6">
-      {/* Price Range */}
-      <Collapsible
-        open={openSections.price}
-        onOpenChange={(open) => setOpenSections((prev) => ({ ...prev, price: open }))}
-      >
-        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
-          <h3 className="text-sm font-semibold">Khoảng giá</h3>
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.price ? 'rotate-180' : ''}`} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4">
-          <PriceRangeSlider
-            min={priceRange[0]}
-            max={priceRange[1]}
-            value={filters.priceRange}
-            onChange={handlePriceRangeChange}
-          />
-        </CollapsibleContent>
-      </Collapsible>
-
-      <div className="border-t border-border" />
-
-      {/* Categories */}
-      <Collapsible
-        open={openSections.category}
-        onOpenChange={(open) => setOpenSections((prev) => ({ ...prev, category: open }))}
-      >
-        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
-          <h3 className="text-sm font-semibold">Danh mục</h3>
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.category ? 'rotate-180' : ''}`} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4 space-y-3">
-          {categories.filter((c) => c.slug !== 'all').map((category) => (
-            <label
-              key={category.id}
-              className="flex items-center gap-3 cursor-pointer group"
-            >
-              <Checkbox
-                checked={filters.categories.includes(category.slug)}
-                onCheckedChange={() => toggleArrayFilter('categories', category.slug)}
-              />
-              <span className="text-sm group-hover:text-foreground transition-colors">
-                {category.name}
-              </span>
-            </label>
-          ))}
-        </CollapsibleContent>
-      </Collapsible>
-
-      <div className="border-t border-border" />
-
-      {/* Sizes */}
-      <Collapsible
-        open={openSections.size}
-        onOpenChange={(open) => setOpenSections((prev) => ({ ...prev, size: open }))}
-      >
-        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
-          <h3 className="text-sm font-semibold">Kích thước</h3>
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.size ? 'rotate-180' : ''}`} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4">
-          <div className="flex flex-wrap gap-2">
-            {availableSizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => toggleArrayFilter('sizes', size)}
-                className={cn(
-                  'min-w-12 px-4 py-2 rounded-full border-2 text-sm font-medium transition-all',
-                  filters.sizes.includes(size)
-                    ? 'border-accent bg-accent text-accent-foreground'
-                    : 'border-border hover:border-muted-foreground'
-                )}
-              >
-                {size}
-              </button>
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      <div className="border-t border-border" />
-
-      {/* Colors */}
-      <Collapsible
-        open={openSections.color}
-        onOpenChange={(open) => setOpenSections((prev) => ({ ...prev, color: open }))}
-      >
-        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
-          <h3 className="text-sm font-semibold">Màu sắc</h3>
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.color ? 'rotate-180' : ''}`} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4">
-          <div className="flex flex-wrap gap-2">
-            {availableColors.map((color) => (
-              <button
-                key={color.value}
-                onClick={() => toggleArrayFilter('colors', color.value)}
-                className={cn(
-                  'w-10 h-10 rounded-full transition-all',
-                  filters.colors.includes(color.value)
-                    ? 'border-[3px] border-accent scale-110'
-                    : 'border-2 border-border hover:border-muted-foreground'
-                )}
-                style={{ backgroundColor: color.hex }}
-                title={color.name}
-                aria-label={color.name}
-              />
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-
-      <div className="border-t border-border" />
-
-      {/* Other Filters */}
-      <Collapsible
-        open={openSections.other}
-        onOpenChange={(open) => setOpenSections((prev) => ({ ...prev, other: open }))}
-      >
-        <CollapsibleTrigger className="flex w-full items-center justify-between py-2 hover:text-foreground transition-colors">
-          <h3 className="text-sm font-semibold">Khác</h3>
-          <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${openSections.other ? 'rotate-180' : ''}`} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4 space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <Checkbox
-              checked={filters.inStock}
-              onCheckedChange={(checked) => updateFilter('inStock', !!checked)}
-            />
-            <span className="text-sm group-hover:text-foreground transition-colors">
-              Còn hàng
-            </span>
-          </label>
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <Checkbox
-              checked={filters.freeShipping}
-              onCheckedChange={(checked) => updateFilter('freeShipping', !!checked)}
-            />
-            <span className="text-sm group-hover:text-foreground transition-colors">
-              Miễn phí vận chuyển
-            </span>
-          </label>
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
-  )
-
   return (
     <div className="space-y-4">
       {/* Search Bar */}
@@ -326,7 +367,18 @@ export function ProductFilters({
               <SheetTitle>Bộ lọc</SheetTitle>
             </SheetHeader>
             <div className="mt-6">
-              <FilterContent />
+              <FilterContent
+                filters={filters}
+                priceRange={priceRange}
+                categories={categories}
+                availableSizes={availableSizes}
+                availableColors={availableColors}
+                openSections={openSections}
+                onOpenSectionsChange={setOpenSections}
+                onPriceRangeChange={handlePriceRangeChange}
+                onToggleArrayFilter={toggleArrayFilter}
+                onUpdateFilter={updateFilter}
+              />
               {activeFilterCount > 0 && (
                 <Button
                   variant="outline"
@@ -357,7 +409,18 @@ export function ProductFilters({
               </Button>
             )}
           </div>
-          <FilterContent />
+          <FilterContent
+            filters={filters}
+            priceRange={priceRange}
+            categories={categories}
+            availableSizes={availableSizes}
+            availableColors={availableColors}
+            openSections={openSections}
+            onOpenSectionsChange={setOpenSections}
+            onPriceRangeChange={handlePriceRangeChange}
+            onToggleArrayFilter={toggleArrayFilter}
+            onUpdateFilter={updateFilter}
+          />
         </div>
       </div>
     </div>
